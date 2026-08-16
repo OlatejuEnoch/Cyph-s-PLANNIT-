@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Work smart with Plannit - Cyph</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+</head>
+<body class="theme-transition min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+  <div class="max-w-3xl mx-auto px-4 py-6 md:py-10">
+
+    <!-- Header -->
+    <header class="flex items-start justify-between mb-6 gap-4">
+      <div>
+        <div class="flex items-center gap-3 mb-1">
+          <div class="w-11 h-11 rounded-xl bg-indigo-500/20 dark:bg-indigo-500/30 flex items-center justify-center">
+            <i class="fas fa-robot text-xl text-indigo-600 dark:text-indigo-400"></i>
+          </div>
+          <h1 class="text-2xl md:text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-cyan-500 dark:from-indigo-400 dark:to-cyan-400">
+            PLANNIT
+          </h1>
+        </div>
+        <p class="text-slate-500 dark:text-slate-400 text-sm ml-14">Plan smarter • Tick tasks • AI schedules • Reminders</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="themeToggle" title="Toggle theme" class="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-700 transition">
+          <i class="fas fa-moon dark:hidden text-slate-600"></i>
+          <i class="fas fa-sun hidden dark:inline text-amber-400"></i>
+        </button>
+        <button id="settingsBtn" title="Settings & AI Key" class="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center hover:bg-slate-50 dark:hover:bg-slate-700 transition">
+          <i class="fas fa-cog text-slate-600 dark:text-slate-300"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Live Clock + Next Reminder -->
+    <section class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 mb-6 shadow-sm flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center">
+          <i class="fas fa-clock text-indigo-600 dark:text-indigo-400 text-xl"></i>
+        </div>
+        <div>
+          <div id="liveClock" class="text-2xl md:text-3xl font-semibold clock-digit tracking-tight">00:00:00</div>
+          <div id="liveDate" class="text-xs text-slate-500 dark:text-slate-400">—</div>
+        </div>
+      </div>
+      <div class="text-right">
+        <div class="text-xs text-slate-500 dark:text-slate-400 mb-0.5">Next reminder</div>
+        <div id="nextReminder" class="text-sm font-medium text-indigo-600 dark:text-indigo-400">None upcoming</div>
+      </div>
+      <button id="enableNotifBtn" class="text-xs px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition text-slate-600 dark:text-slate-300">
+        <i class="fas fa-bell mr-1"></i> Enable notifications
+      </button>
+    </section>
+
+    <!-- AI Draft Section -->
+    <section class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 mb-6 shadow-sm">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-9 h-9 rounded-lg bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center">
+          <i class="fas fa-magic text-indigo-600 dark:text-indigo-400"></i>
+        </div>
+        <div>
+          <h2 class="font-semibold">AI Schedule Drafter</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Describe goals → get a timed plan</p>
+        </div>
+        <span id="aiModeBadge" class="ml-auto text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">Local AI</span>
+      </div>
+
+      <textarea id="aiPrompt" rows="2" placeholder="e.g. Productive workday with gym, deep work, meetings and evening wind-down..."
+        class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"></textarea>
+
+      <div class="flex flex-wrap gap-2 mt-3">
+        <button id="aiGenerateBtn" class="flex-1 min-w-[130px] bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-medium py-2 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition">
+          <i class="fas fa-wand-magic-sparkles"></i> Generate
+        </button>
+        <button id="quickIdeasBtn" class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-medium py-2 px-3 rounded-xl text-sm transition">
+          Quick Ideas
+        </button>
+      </div>
+      <div id="aiStatus" class="hidden mt-2 text-sm text-indigo-600 dark:text-indigo-300 flex items-center gap-2">
+        <i class="fas fa-spinner fa-spin"></i> <span>Drafting schedule...</span>
+      </div>
+    </section>
+
+    <!-- Add Task -->
+    <section class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 mb-5 shadow-sm">
+      <form id="addTaskForm" class="flex flex-wrap gap-2">
+        <input type="text" id="taskInput" placeholder="Add a task..." required
+          class="flex-1 min-w-[140px] bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <input type="time" id="taskTime" title="Reminder time"
+          class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-[110px]">
+        <select id="taskCategory"
+          class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <option value="">No category</option>
+          <option value="Work">Work</option>
+          <option value="Study">Study</option>
+          <option value="Health">Health</option>
+          <option value="Personal">Personal</option>
+          <option value="Chores">Chores</option>
+          <option value="Family">Family</option>
+        </select>
+        <select id="taskRecurring"
+          class="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <option value="">One-time</option>
+          <option value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+        </select>
+        <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl transition">
+          <i class="fas fa-plus"></i>
+        </button>
+      </form>
+      <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-2"><i class="far fa-bell mr-1"></i> Set a time to get a reminder when that moment arrives</p>
+    </section>
+
+    <!-- Filters & Actions -->
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <div class="flex flex-wrap gap-1.5">
+        <button data-filter="all" class="filter-btn active px-2.5 py-1 rounded-lg text-xs font-medium bg-indigo-600 text-white">All</button>
+        <button data-filter="active" class="filter-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Active</button>
+        <button data-filter="completed" class="filter-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Done</button>
+        <span class="w-px h-5 bg-slate-300 dark:bg-slate-700 mx-1 self-center"></span>
+        <button data-cat="" class="cat-btn active px-2.5 py-1 rounded-lg text-xs font-medium bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300">Any</button>
+        <button data-cat="Work" class="cat-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Work</button>
+        <button data-cat="Study" class="cat-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Study</button>
+        <button data-cat="Health" class="cat-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Health</button>
+        <button data-cat="Personal" class="cat-btn px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Personal</button>
+      </div>
+      <div class="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+        <span id="statsText">0 tasks</span>
+        <button id="exportBtn" class="hover:text-indigo-500 transition" title="Export"><i class="fas fa-download"></i></button>
+      </div>
+    </div>
+
+    <!-- Task List -->
+    <ul id="taskList" class="space-y-2 mb-6"></ul>
+
+    <div id="emptyState" class="text-center py-14 text-slate-400 dark:text-slate-600">
+      <i class="fas fa-clipboard-list text-4xl mb-3 opacity-50"></i>
+      <p class="font-medium">No tasks yet</p>
+      <p class="text-sm mt-1">Add one or let AI draft a schedule</p>
+    </div>
+
+    <div class="flex justify-center gap-5 text-xs text-slate-400 dark:text-slate-500">
+      <button id="clearCompleted" class="hover:text-red-500 transition">Clear completed</button>
+      <button id="clearAll" class="hover:text-red-500 transition">Clear all</button>
+    </div>
+
+    <footer class="text-center text-slate-400 dark:text-slate-600 text-[11px] mt-10">
+      PLANNIT • Data stays in your browser
+      <p style="float: right;">#Cypher</p>
+    </footer>
+  </div>
+
+  <!-- Toast for in-app reminders -->
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 max-w-sm w-[90%] bg-indigo-600 text-white px-4 py-3 rounded-xl shadow-2xl hidden items-center gap-3 z-50">
+    <i class="fas fa-bell text-lg"></i>
+    <div class="flex-1 text-sm" id="toastText">Reminder</div>
+    <button id="toastClose" class="text-white/80 hover:text-white"><i class="fas fa-times"></i></button>
+  </div>
+
+  <!-- Quick Ideas Modal -->
+  <div id="ideasModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 max-w-md w-full shadow-2xl">
+      <h3 class="font-semibold mb-3">Quick Schedule Ideas</h3>
+      <div class="space-y-1.5">
+        <button class="idea-btn w-full text-left px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-sm transition" data-idea="Create a productive weekday with deep work, meetings, exercise and evening wind-down">💼 Productive Workday</button>
+        <button class="idea-btn w-full text-left px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-sm transition" data-idea="Student study plan with focused blocks, breaks, practice and review">📚 Study Day</button>
+        <button class="idea-btn w-full text-left px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-sm transition" data-idea="Balanced weekend with chores, self-care, social time and rest">🌴 Weekend Balance</button>
+        <button class="idea-btn w-full text-left px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-sm transition" data-idea="Healthy morning routine: wake, hydrate, exercise, breakfast, plan the day">🌅 Morning Routine</button>
+      </div>
+      <button id="closeIdeas" class="mt-4 w-full py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-sm">Close</button>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 max-w-md w-full shadow-2xl">
+      <h3 class="font-semibold mb-4">Settings</h3>
+
+      <label class="block text-sm font-medium mb-1.5">AI Mode</label>
+      <select id="aiModeSelect" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm mb-4 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <option value="local">Local smart drafter (offline, free)</option>
+        <option value="openai">OpenAI-compatible API (your key)</option>
+      </select>
+
+      <div id="apiKeySection" class="hidden">
+        <label class="block text-sm font-medium mb-1.5">API Key <span class="text-xs text-slate-400">(stored only in your browser)</span></label>
+        <input type="password" id="apiKeyInput" placeholder="sk-... or xai-..."
+          class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <label class="block text-sm font-medium mb-1.5">API Base URL</label>
+        <input type="text" id="apiBaseInput" value="https://api.openai.com/v1"
+          class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm mb-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <label class="block text-sm font-medium mb-1.5">Model</label>
+        <input type="text" id="apiModelInput" value="gpt-4o-mini"
+          class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Works with OpenAI, xAI (Grok), Groq, Together, etc.</p>
+      </div>
+
+      <div class="flex gap-2">
+        <button id="saveSettings" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white py-2 rounded-xl text-sm font-medium">Save</button>
+        <button id="closeSettings" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-sm">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Export Modal -->
+  <div id="exportModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 max-w-md w-full shadow-2xl">
+      <h3 class="font-semibold mb-3">Export Tasks</h3>
+      <div class="space-y-2">
+        <button id="exportJSON" class="w-full text-left px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-sm transition">
+          <i class="fas fa-file-code mr-2 text-indigo-500"></i> Download JSON
+        </button>
+        <button id="exportCSV" class="w-full text-left px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-sm transition">
+          <i class="fas fa-file-csv mr-2 text-green-500"></i> Download CSV
+        </button>
+        <button id="exportPrint" class="w-full text-left px-3.5 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-sm transition">
+          <i class="fas fa-print mr-2 text-slate-500"></i> Print / PDF
+        </button>
+      </div>
+      <button id="closeExport" class="mt-4 w-full py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-sm">Close</button>
+    </div>
+  </div>
+
+  <script src="script.js">
+      </script>
+</body>
+</html>
